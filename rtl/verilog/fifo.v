@@ -18,6 +18,15 @@ module fifo
     parameter DATA_WIDTH = 0
     )
    (
+`ifdef FORMAL
+    // peek_address and peek_data break out direct access to the block RAM backing the FIFO, which is useful for formal
+    // proofs by induction.
+    input  [DEPTH_WIDTH-1:0] peek_address,
+    output [DATA_WIDTH-1:0]  peek_data,
+    // space_remaining is the number of free items left in the FIFO, which is useful for formal proofs by induction.
+    output [DEPTH_WIDTH-1:0] space_remaining,
+`endif
+
     input 		    clk,
     input 		    rst,
 
@@ -51,6 +60,10 @@ module fifo
    
    assign full_o  = full_or_empty & !empty_int;
    assign empty_o = full_or_empty & empty_int;
+
+`ifdef FORMAL
+   assign space_remaining = empty_o? 2**AW : read_pointer[AW-1:0] - write_pointer[AW-1:0];
+`endif
    
    always @(posedge clk) begin
       if (wr_en_i)
@@ -72,6 +85,10 @@ module fifo
        )
    fifo_ram
      (
+`ifdef FORMAL
+      .peek_address (peek_address),
+      .peek_data    (peek_data),
+`endif
       .clk			(clk),
       .dout			(rd_data_o),
       .raddr			(read_pointer[AW-1:0]),

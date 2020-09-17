@@ -19,6 +19,10 @@ module simple_dpram_sclk
     parameter ENABLE_BYPASS = 1
     )
    (
+`ifdef FORMAL
+    input      [ADDR_WIDTH-1:0] peek_address,
+    output reg [DATA_WIDTH-1:0] peek_data,
+`endif
     input 		    clk,
     input [ADDR_WIDTH-1:0]  raddr,
     input 		    re,
@@ -58,5 +62,11 @@ endgenerate
       if (re)
 	rdata <= mem[raddr];
    end
+
+`ifdef FORMAL
+    // Add the ability to peek into the block RAM without delay when doing formal proofs
+    always @(*)
+        peek_data = mem[peek_address];
+`endif
 
 endmodule
