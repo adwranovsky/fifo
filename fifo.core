@@ -1,6 +1,6 @@
 CAPI=2:
 
-name : ::fifo:1.3
+name : adwranovsky:notmyip:fifo:1.3
 description : Generic FIFO
 
 filesets:
