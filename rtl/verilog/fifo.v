@@ -24,7 +24,7 @@ module fifo
     input  [DEPTH_WIDTH-1:0] peek_address,
     output [DATA_WIDTH-1:0]  peek_data,
     // space_remaining is the number of free items left in the FIFO, which is useful for formal proofs by induction.
-    output [DEPTH_WIDTH-1:0] space_remaining,
+    output [DEPTH_WIDTH:0] space_remaining,
 `endif
 
     input 		    clk,
@@ -62,7 +62,7 @@ module fifo
    assign empty_o = full_or_empty & empty_int;
 
 `ifdef FORMAL
-   assign space_remaining = empty_o? 2**AW : read_pointer[AW-1:0] - write_pointer[AW-1:0];
+   assign space_remaining = empty_o? 2**AW : {1'b0, read_pointer[AW-1:0] - write_pointer[AW-1:0]};
 `endif
    
    always @(posedge clk) begin
